@@ -1,0 +1,21 @@
+image:
+  file: .gitpod.Dockerfile
+
+ports:
+  - port: 5432
+    onOpen: ignore
+
+tasks:
+  - command: |
+      set -a
+      . .envs/.local/.gitpod.postgres
+      set +a
+      clear
+      echo "=============="
+      echo " README "
+      echo "=============="
+      echo ""
+      echo "1. Installed: $(psql --version)"
+      echo ""
+      echo "2. Exported env variables: \`.envs/.local/.gitpod_postgres\`"
+      echo ""
