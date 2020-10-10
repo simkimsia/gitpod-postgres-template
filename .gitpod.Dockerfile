@@ -1,34 +1,38 @@
 FROM gitpod/workspace-postgres
 
 # default user is gitpod
-# Cannot use entrypoint as gitpod already using that
-# Run this url https://gitpod.io/#<https://github.url/to-the-repo> for main branch
-# Run this url https://gitpod.io/#<https://github.url/to-the-repo/tree/branch-name> for specific branch
+# Run this url https://gitpod.io/#https://github.com/<user>/<repo> OR
+# https://gitpod.io/#https://github.com/<user>/<repo>/tree/<branch-name>
 
-# apt update
-RUN sudo apt-get update
-
-# Install other software needed
-# RUN sudo apt-get install -y <software>
-
-# Install software while using noninteractive debian frontend to avoid setting keyboard config
-# RUN sudo DEBIAN_FRONTEND=noninteractive apt-get install -y <software>
-
-# remove lists and tmp
-RUN sudo rm -rf /var/lib/apt/lists/* /tmp/*
-
-# apt clean
-RUN sudo apt-get clean
-
-# ENTRYPOINT doesn't work in gitpod dockerfiles
-# ENV DATABASE_URL="postgresql://gitpod@localhost/postgres" is the most impt
-# but we load this via init in the .gitpod.yml Python task
-
-# Switch to root user in case need to use curl to install software via bash
+# need to run as root else curl and install and apt-get clean won't work
+# so I skip all the sudo
 USER root
 
-# curl install software via bash
-# RUN curl <some-url!> | bash
+RUN apt-get update
+
+# Install your packages here
+
+## <Some Package>
+
+## Install Dropbear SSH server for chisel to work
+#  Need the noninteractive to skip the keyboard config
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq dropbear
+
+## Chisel
+#  This runs thru the installer https://github.com/jpillora/installer
+#  and caching may be an issue https://github.com/jpillora/installer/issues/9
+RUN curl https://i.jpillora.com/chisel! | bash
+
+# End of installing your packages
+
+# remove lists and tmp
+RUN rm -rf /var/lib/apt/lists/* /tmp/*
+
+# apt clean
+RUN apt-get clean
+
+# ENTRYPOINT doesn't work in gitpod dockerfiles
+# We load env variables in files inside .envs folder via .gitpod.yml
 
 # Switch back to gitpod
 USER gitpod
